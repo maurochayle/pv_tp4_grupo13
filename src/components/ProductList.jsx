@@ -1,15 +1,7 @@
-const ProductList = ({ productos, setProductoEnEdicion, setProductos }) => {
-  const handleEliminar = (id) => {
-    const confirmacion = window.confirm('¿Estás seguro que querés eliminar este producto?');
-    if (confirmacion) {
-      const nuevaLista = productos.filter((prod) => prod.id !== id);
-      setProductos(nuevaLista);
-    }
-  };
-
+const ProductList = ({ productos, setProductoEnEdicion, eliminarProducto }) => {
   const handleEditar = (producto) => {
     setProductoEnEdicion(producto);
-    window.scrollTo(0, 0); // opcional: sube al formulario
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -28,7 +20,7 @@ const ProductList = ({ productos, setProductoEnEdicion, setProductos }) => {
               <strong>Precio con descuento: ${producto.precioConDescuento}</strong><br />
               Stock: {producto.stock} unidades<br />
               <button onClick={() => handleEditar(producto)}>Editar</button>
-              <button onClick={() => handleEliminar(producto.id)}>Eliminar</button>
+              <button onClick={() => eliminarProducto(producto.id)}>Eliminar</button>
               <hr />
             </li>
           ))}

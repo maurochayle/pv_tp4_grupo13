@@ -1,37 +1,58 @@
-import { useState } from 'react'
-import './App.css'
-import ProductForm from './components/ProductForm'
-import ProductList from './components/ProductList'
-import Searchbar from './components/Searchbar'
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import './App.css';
+import ProductForm from './components/ProductForm';
+import ProductList from './components/ProductList';
+import Searchbar from './components/Searchbar';
 
 function App() {
-  const [productos, setProductos] = useState([]); //se usa para mostrar productos en ProductList, filtrar en SearchBar editar/eliminar
+  const [productos, setProductos] = useState([]);
   const [productoEnEdicion, setProductoEnEdicion] = useState(null);
- //se vuelve null cuando terminamos de editar o cancelar la edición
-  const [busqueda, setBusqueda] = useState(''); //ingresa valor a buscar, se usa en SearchBar ProductList
-  //Con estas 3 variables cubrimos lo que pide el tp, cargar productos nuevos, editarlos, buscarlos, borrarlos
+  const [busqueda, setBusqueda] = useState('');
+
+  useEffect(() => {
+    console.log('🛒 Lista actualizada:', productos);
+  }, [productos]);
+
+  const agregarProducto = useCallback((nuevo) => {
+    setProductos(prev => [...prev, nuevo]);
+  }, []);
+
+  const eliminarProducto = useCallback((id) => {
+    const confirmacion = window.confirm("¿Eliminar este producto?");
+    if (confirmacion) {
+      setProductos(prev => prev.filter(p => p.id !== id));
+    }
+  }, []);
+
+  const productosFiltrados = useMemo(() => {
+    return productos.filter((prod) =>
+      prod.descripcion.toLowerCase().includes(busqueda.toLowerCase()) ||
+      prod.id.toString().includes(busqueda)
+    );
+  }, [productos, busqueda]);
 
   return (
-   <div>
+    <div>
       <h1>Gestor de productos</h1>
-      <Searchbar/>
+
+      <Searchbar onSearch={setBusqueda} />
+
       <ProductForm
-        agregarProducto={(nuevo) => setProductos([...productos, nuevo])}
+        agregarProducto={agregarProducto}
         productoEnEdicion={productoEnEdicion}
         setProductoEnEdicion={setProductoEnEdicion}
         productos={productos}
         setProductos={setProductos}
-        />
-
-      <ProductList 
-        productos={productos}
-        setProductoEnEdicion={setProductoEnEdicion}
-        setProductos={setProductos}
       />
 
-   </div>
-
-  )
+      <ProductList
+        productos={productosFiltrados}
+        setProductoEnEdicion={setProductoEnEdicion}
+        setProductos={setProductos}
+        eliminarProducto={eliminarProducto}
+      />
+    </div>
+  );
 }
 
-export default App
+export default App;
